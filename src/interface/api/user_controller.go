@@ -7,6 +7,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// CreateUser func creates user.
+// @Description Создание пользователя.
+// @Accept json
+// @Param input body domain.User true "Пользователь"
+// @Success 200
+// @Router /create_user [post]
 func CreateUser(c *fiber.Ctx) error {
 	// Создание пользователя
 	user := new(domain.User)

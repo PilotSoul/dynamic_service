@@ -1,0 +1,126 @@
+definitions:
+  controllers.UserId:
+    properties:
+      user_id:
+        type: integer
+    type: object
+  controllers.UserSegments:
+    properties:
+      segments:
+        items:
+          type: string
+        type: array
+      user_id:
+        type: integer
+    type: object
+  domain.Segment:
+    properties:
+      name:
+        type: string
+    type: object
+  domain.User:
+    properties:
+      name:
+        type: string
+    type: object
+host: 127.0.0.1:3000
+info:
+  contact: {}
+  description: Документация для  сервиса, хранящего пользователя и сегменты, в которых
+    он состоит.
+  title: Dynamic service
+  version: "1.0"
+paths:
+  /add_user_to_segment:
+    post:
+      consumes:
+      - application/json
+      description: Добавление сегментов пользователю.
+      parameters:
+      - description: Пользовательские сегменты
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UserSegments'
+      responses:
+        "200":
+          description: OK
+  /create_segment:
+    post:
+      consumes:
+      - application/json
+      description: Создание сегмента.
+      parameters:
+      - description: Название сегмента
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Segment'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Segment'
+  /create_user:
+    post:
+      consumes:
+      - application/json
+      description: Создание пользователя.
+      parameters:
+      - description: Пользователь
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.User'
+      responses:
+        "200":
+          description: OK
+  /delete_segment:
+    post:
+      consumes:
+      - application/json
+      description: Удаление сегмента.
+      parameters:
+      - description: Название сегмента
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Segment'
+      responses:
+        "200":
+          description: OK
+  /delete_user_from_segment:
+    post:
+      consumes:
+      - application/json
+      description: Удаление сегментов у пользователя.
+      parameters:
+      - description: Пользовательские сегменты
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UserSegments'
+      responses:
+        "200":
+          description: OK
+  /show_segments:
+    get:
+      consumes:
+      - application/json
+      description: Вывод списка активных сегментов у пользователя.
+      parameters:
+      - description: Пользователь
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UserId'
+      responses:
+        "200":
+          description: OK
+swagger: "2.0"

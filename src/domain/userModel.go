@@ -3,9 +3,9 @@ package domain
 import "time"
 
 type User struct {
-	ID       int       `json:"id" gorm:"primary_key"`
+	ID       int       `json:"id" gorm:"primary_key" swaggerignore:"true"`
 	Name     string    `json:"name"`
-	Segments []Segment `gorm:"many2many:user_segments"`
+	Segments []Segment `gorm:"many2many:user_segments" swaggerignore:"true"`
 }
 
 type UserSegment struct {

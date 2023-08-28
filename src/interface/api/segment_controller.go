@@ -8,8 +8,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// CreateSegment func creates a segment.
+// @Description Создание сегмента.
+// @Accept json
+// @Param input body domain.Segment true "Название сегмента"
+// @Success 200 {object} domain.Segment
+// @Router /create_segment [post]
 func CreateSegment(c *fiber.Ctx) error {
 	// Создание сегмента
+	fmt.Println("Hellllo")
 	segment := new(domain.Segment)
 	if err := c.BodyParser(segment); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -21,10 +28,20 @@ func CreateSegment(c *fiber.Ctx) error {
 			"message": "Name cannot be empty",
 		})
 	}
+	segment_db := infrastructure.DB.Db.Where("Name = ?", segment.Name).First(&segment)
+	if segment_db.RowsAffected > 0 {
+		return fmt.Errorf("segment with name %s already exist", segment.Name)
+	}
 	infrastructure.DB.Db.Create(&segment)
 	return c.Status(200).JSON(segment)
 }
 
+// DeleteSegment func deletes a segment.
+// @Description Удаление сегмента.
+// @Accept json
+// @Param input body domain.Segment true "Название сегмента"
+// @Success 200
+// @Router /delete_segment [post]
 func DeleteSegment(c *fiber.Ctx) error {
 	// Удаление сегмента
 	segment := new(domain.Segment)
@@ -48,8 +65,14 @@ type UserSegments struct {
 	Segments []string `json:"segments"`
 }
 
+// AddSegmentыfunc add segments to user.
+// @Description Добавление сегментов пользователю.
+// @Accept json
+// @Param input body UserSegments true "Пользовательские сегменты"
+// @Success 200
+// @Router /add_user_to_segment [post]
 func AddSegments(c *fiber.Ctx) error {
-	// Добавлене сегментов пользователю
+	// Добавление сегментов пользователю
 	userSegments := new(UserSegments)
 	if err := c.BodyParser(&userSegments); err != nil {
 		return err
@@ -79,6 +102,16 @@ func AddSegments(c *fiber.Ctx) error {
 	return c.Status(200).JSON("Segments added")
 }
 
+type UserId struct {
+	ID int `json:"ID"`
+}
+
+// ShowUserSegments func show user's segments.
+// @Description Вывод списка активных сегментов у пользователя.
+// @Accept json
+// @Param input body UserId true "Пользователь"
+// @Success 200
+// @Router /show_segments [get]
 func ShowUserSegments(c *fiber.Ctx) error {
 	// Вывод списка активных сегментов у пользователя
 	user := new(domain.User)
@@ -96,6 +129,12 @@ func ShowUserSegments(c *fiber.Ctx) error {
 	return c.Status(200).JSON(userSegments)
 }
 
+// DeleteSegments func delete user's segments.
+// @Description Удаление сегментов у пользователя.
+// @Accept json
+// @Param input body UserSegments true "Пользовательские сегменты"
+// @Success 200
+// @Router /delete_user_from_segment [post]
 func DeleteSegments(c *fiber.Ctx) error {
 	// Удаление сегмента у пользователя
 	userSegments := new(UserSegments)
@@ -123,7 +162,6 @@ func DeleteSegments(c *fiber.Ctx) error {
 			userSegment := []domain.UserSegment{{UserID: user.ID, SegmentID: segment.ID}}
 			infrastructure.DB.Db.Delete(&userSegment)
 		}
-
 	}
 	return c.Status(200).JSON("OK")
 }

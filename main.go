@@ -5,7 +5,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	_ "PilotSoul/dynamic_service/src/docs"
+	_ "PilotSoul/dynamic_service/docs"
+
+	"PilotSoul/dynamic_service/src"
 
 	"github.com/gofiber/swagger"
 )
@@ -17,7 +19,7 @@ import (
 func main() {
 	infrastructure.ConnectDB()
 	app := fiber.New()
-	setupRoutes(app)
+	src.SetupRoutes(app)
 	app.Get("/swagger/*", swagger.HandlerDefault) // default
 	app.Listen(":3000")
 }

@@ -1,7 +1,7 @@
 definitions:
   controllers.UserId:
     properties:
-      user_id:
+      ID:
         type: integer
     type: object
   controllers.UserSegments:
@@ -109,10 +109,10 @@ paths:
         "200":
           description: OK
   /show_segments:
-    get:
+    post:
       consumes:
       - application/json
-      description: Вывод списка активных сегментов у пользователя.
+      description: Вывод списка активны сегментов у пользователя.
       parameters:
       - description: Пользователь
         in: body

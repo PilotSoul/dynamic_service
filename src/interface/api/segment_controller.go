@@ -4,6 +4,7 @@ import (
 	"PilotSoul/dynamic_service/src/domain"
 	"PilotSoul/dynamic_service/src/infrastructure"
 	"fmt"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -16,8 +17,8 @@ import (
 // @Router /create_segment [post]
 func CreateSegment(c *fiber.Ctx) error {
 	// Создание сегмента
-	fmt.Println("Hellllo")
 	segment := new(domain.Segment)
+	fmt.Println(segment.Name)
 	if err := c.BodyParser(segment); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
@@ -33,7 +34,7 @@ func CreateSegment(c *fiber.Ctx) error {
 		return fmt.Errorf("segment with name %s already exist", segment.Name)
 	}
 	infrastructure.DB.Db.Create(&segment)
-	return c.Status(200).JSON(segment)
+	return c.Status(fiber.StatusOK).JSON(segment)
 }
 
 // DeleteSegment func deletes a segment.
@@ -57,7 +58,7 @@ func DeleteSegment(c *fiber.Ctx) error {
 	} else if db.RowsAffected < 1 {
 		return fmt.Errorf("row with name=%s cannot be deleted because it doesn't exist", segment_name)
 	}
-	return c.Status(200).JSON("Segment deleted")
+	return c.Status(fiber.StatusOK).JSON("Segment deleted")
 }
 
 type UserSegments struct {
@@ -99,7 +100,7 @@ func AddSegments(c *fiber.Ctx) error {
 		infrastructure.DB.Db.Create(&userSegment)
 
 	}
-	return c.Status(200).JSON("Segments added")
+	return c.Status(fiber.StatusOK).JSON("Segments added")
 }
 
 type UserId struct {
@@ -108,25 +109,24 @@ type UserId struct {
 
 // ShowUserSegments func show user's segments.
 // @Description Вывод списка активных сегментов у пользователя.
-// @Accept json
-// @Param input body UserId true "Пользователь"
 // @Success 200
-// @Router /show_segments [get]
+// @Router /show_segments [post]
 func ShowUserSegments(c *fiber.Ctx) error {
 	// Вывод списка активных сегментов у пользователя
+	// if deleted time exist do not show this row
 	user := new(domain.User)
-	if err := c.BodyParser(&user); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": err.Error(),
-		})
+	user_id, err := strconv.Atoi(c.Params("user"))
+	if err != nil {
+		panic(err)
 	}
-	infrastructure.DB.Db.Preload("Segments").Find(&user, "id = ?", user.ID)
+
+	infrastructure.DB.Db.Preload("Segments").Find(&user, "id = ?", user_id)
 	userSegments := new(UserSegments)
-	userSegments.UserID = user.ID
+	userSegments.UserID = user_id
 	for i := 0; i < len(user.Segments); i++ {
 		userSegments.Segments = append(userSegments.Segments, user.Segments[i].Name)
 	}
-	return c.Status(200).JSON(userSegments)
+	return c.Status(fiber.StatusOK).JSON(userSegments)
 }
 
 // DeleteSegments func delete user's segments.
@@ -137,6 +137,7 @@ func ShowUserSegments(c *fiber.Ctx) error {
 // @Router /delete_user_from_segment [post]
 func DeleteSegments(c *fiber.Ctx) error {
 	// Удаление сегмента у пользователя
+	// TO-DO deleted_time and range by deleted time
 	userSegments := new(UserSegments)
 	if err := c.BodyParser(&userSegments); err != nil {
 		return err
@@ -163,5 +164,5 @@ func DeleteSegments(c *fiber.Ctx) error {
 			infrastructure.DB.Db.Delete(&userSegment)
 		}
 	}
-	return c.Status(200).JSON("OK")
+	return c.Status(fiber.StatusOK).JSON("OK")
 }

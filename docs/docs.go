@@ -140,8 +140,8 @@ const docTemplate = `{
             }
         },
         "/show_segments": {
-            "get": {
-                "description": "Вывод списка активных сегментов у пользователя.",
+            "post": {
+                "description": "Вывод списка активны сегментов у пользователя.",
                 "consumes": [
                     "application/json"
                 ],
@@ -168,7 +168,7 @@ const docTemplate = `{
         "controllers.UserId": {
             "type": "object",
             "properties": {
-                "user_id": {
+                "ID": {
                     "type": "integer"
                 }
             }

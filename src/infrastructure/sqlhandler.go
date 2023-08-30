@@ -16,7 +16,7 @@ type SqlHandler struct {
 var DB SqlHandler
 
 func ConnectDB() {
-	err := godotenv.Load(".env")
+	err := godotenv.Load("./.env")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,9 +37,6 @@ func ConnectDB() {
 	if err != nil {
 		panic(err.Error)
 	}
-
-	// sqlHandler := new(SqlHandler)
-	// sqlHandler.Db = db
 
 	DB = SqlHandler{
 		Db: db,

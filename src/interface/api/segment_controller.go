@@ -5,6 +5,7 @@ import (
 	"PilotSoul/dynamic_service/src/infrastructure"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -103,28 +104,25 @@ func AddSegments(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON("Segments added")
 }
 
-type UserId struct {
-	ID int `json:"ID"`
-}
-
 // ShowUserSegments func show user's segments.
 // @Description Вывод списка активных сегментов у пользователя.
+// @Param user_id path int true "User ID"
 // @Success 200
-// @Router /show_segments [post]
+// @Router /show_segments/{user_id} [get]
 func ShowUserSegments(c *fiber.Ctx) error {
 	// Вывод списка активных сегментов у пользователя
-	// if deleted time exist do not show this row
-	user := new(domain.User)
-	user_id, err := strconv.Atoi(c.Params("user"))
+	user_id, err := strconv.Atoi(c.Params("user_id"))
 	if err != nil {
 		panic(err)
 	}
-
-	infrastructure.DB.Db.Preload("Segments").Find(&user, "id = ?", user_id)
+	var segments []string
+	infrastructure.DB.Db.Raw(
+		"select segments.name FROM segments LEFT JOIN user_segments ON user_segments.segment_id = segments.id WHERE user_segments.deleted_at IS NULL AND user_segments.user_id = ?",
+		user_id).Scan(&segments)
 	userSegments := new(UserSegments)
 	userSegments.UserID = user_id
-	for i := 0; i < len(user.Segments); i++ {
-		userSegments.Segments = append(userSegments.Segments, user.Segments[i].Name)
+	for i := 0; i < len(segments); i++ {
+		userSegments.Segments = append(userSegments.Segments, segments[i])
 	}
 	return c.Status(fiber.StatusOK).JSON(userSegments)
 }
@@ -137,7 +135,6 @@ func ShowUserSegments(c *fiber.Ctx) error {
 // @Router /delete_user_from_segment [post]
 func DeleteSegments(c *fiber.Ctx) error {
 	// Удаление сегмента у пользователя
-	// TO-DO deleted_time and range by deleted time
 	userSegments := new(UserSegments)
 	if err := c.BodyParser(&userSegments); err != nil {
 		return err
@@ -156,13 +153,13 @@ func DeleteSegments(c *fiber.Ctx) error {
 			segment_name := userSegments.Segments[i]
 			db := infrastructure.DB.Db.Where("Name = ?", segment_name).First(&segment)
 			if db.RowsAffected < 1 {
-				return fmt.Errorf("segment %s cannot be added to user because it doesn't exist", segment_name)
+				return fmt.Errorf("segment %s cannot be deleted because it doesn't exist", segment_name)
 			} else if db.Error != nil {
 				return db.Error
 			}
-			userSegment := []domain.UserSegment{{UserID: user.ID, SegmentID: segment.ID}}
-			infrastructure.DB.Db.Delete(&userSegment)
+			t := time.Now()
+			infrastructure.DB.Db.Model(domain.UserSegment{}).Where("user_id = ? AND segment_id = ?", user.ID, segment.ID).Update("deleted_at", t)
 		}
 	}
-	return c.Status(fiber.StatusOK).JSON("OK")
+	return c.Status(fiber.StatusOK).JSON("User deleted")
 }

@@ -1,9 +1,4 @@
 definitions:
-  controllers.UserId:
-    properties:
-      ID:
-        type: integer
-    type: object
   controllers.UserSegments:
     properties:
       segments:
@@ -108,18 +103,15 @@ paths:
       responses:
         "200":
           description: OK
-  /show_segments:
-    post:
-      consumes:
-      - application/json
-      description: Вывод списка активны сегментов у пользователя.
+  /show_segments/{user_id}:
+    get:
+      description: Вывод списка активных сегментов у пользователя.
       parameters:
-      - description: Пользователь
-        in: body
-        name: input
+      - description: User ID
+        in: path
+        name: user_id
         required: true
-        schema:
-          $ref: '#/definitions/controllers.UserId'
+        type: integer
       responses:
         "200":
           description: OK

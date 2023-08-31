@@ -12,4 +12,5 @@ type UserSegment struct {
 	UserID    int `gorm:"primaryKey"`
 	SegmentID int `gorm:"primaryKey"`
 	CreatedAt time.Time
+	DeletedAt time.Time `gorm:"default:null"`
 }

@@ -14,6 +14,6 @@ func SetupRoutes(app *fiber.App) {
 	// users
 	app.Post("/create_user", controllers.CreateUser)
 	app.Post("/add_user_to_segment", controllers.AddSegments)
-	app.Post("/show_segments/:user<int>", controllers.ShowUserSegments)
+	app.Get("/show_segments/:user_id<int>", controllers.ShowUserSegments)
 	app.Post("/delete_user_from_segment", controllers.DeleteSegments)
 }

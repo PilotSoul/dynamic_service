@@ -139,21 +139,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/show_segments": {
-            "post": {
-                "description": "Вывод списка активны сегментов у пользователя.",
-                "consumes": [
-                    "application/json"
-                ],
+        "/show_segments/{user_id}": {
+            "get": {
+                "description": "Вывод списка активных сегментов у пользователя.",
                 "parameters": [
                     {
-                        "description": "Пользователь",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controllers.UserId"
-                        }
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -165,14 +160,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "controllers.UserId": {
-            "type": "object",
-            "properties": {
-                "ID": {
-                    "type": "integer"
-                }
-            }
-        },
         "controllers.UserSegments": {
             "type": "object",
             "properties": {

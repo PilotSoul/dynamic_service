@@ -9,6 +9,7 @@ services:
       - "3000:3000"
     depends_on:
       - db
+    restart: on-failure
     volumes:
       - .:/usr/src/app
   db:

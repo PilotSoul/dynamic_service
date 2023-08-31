@@ -20,4 +20,6 @@ COPY . ./
 RUN export GOPATH="$HOME/go"
 RUN CGO_ENABLED=0 GOOS=linux go build -o /docker
 
+EXPOSE 3000
+
 CMD ["/docker"]

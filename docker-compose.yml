@@ -1,28 +1,26 @@
-version: '3'
-services:
-  avito:
-    image: postgres:14
-    container_name: avito
-    hostname: avito
-    restart: unless-stopped
-    networks:
-      - avito_net
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=avito
+version: '3.8'
 
+services:
   web:
     build: .
-    networks:
-      - avito_net
-    ports: 
+    env_file:
+      - .env
+    ports:
       - "3000:3000"
     depends_on:
-      - avito
+      - db
+    volumes:
+      - .:/usr/src/app
+  db:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DBName}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
 
-networks:
-  avito_net:
-    driver: bridge
+volumes:
+  postgres-db:
